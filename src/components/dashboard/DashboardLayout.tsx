@@ -2,6 +2,8 @@ import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Bot, LayoutDashboard,  Users, LogOut, Home, MessageSquare, TrendingUp, FileText, Mail, Target } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -12,6 +14,17 @@ interface DashboardLayoutProps {
 const DashboardLayout = ({ children, title, description }: DashboardLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed out",
+      description: "You have been successfully signed out",
+    });
+    navigate("/auth");
+  };
 
   const isAdmin = location.pathname.includes("/admin");
 
@@ -70,7 +83,7 @@ const DashboardLayout = ({ children, title, description }: DashboardLayoutProps)
 
         {/* Logout */}
         <button
-          onClick={() => navigate("/auth")}
+          onClick={handleSignOut}
           className="w-14 h-14 rounded-full flex items-center justify-center bg-muted/50 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all border border-border/30"
         >
           <LogOut className="w-5 h-5" />
