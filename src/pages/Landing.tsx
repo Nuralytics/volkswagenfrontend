@@ -1,9 +1,35 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingUp, Zap, Shield, CheckCircle2, Award, Sparkles, Car, Brain, Cpu, Target, Wrench, Calendar, MessageSquare, BarChart3, Clock, Users, Settings, AlertTriangle } from "lucide-react";
+import { ArrowRight, TrendingUp, Zap, Shield, CheckCircle2, Award, Sparkles, Car, Brain, Cpu, Target, Wrench, Calendar, MessageSquare, BarChart3, Clock, Users, Settings, AlertTriangle, Send, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [chatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState([
+    { text: "Hi! I'm your AI assistant. How can I help you with our automotive services?", sender: "bot" }
+  ]);
+  const [input, setInput] = useState("");
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+    const userMessage = { text: input, sender: "user" };
+    setMessages([...messages, userMessage]);
+    setInput("");
+
+    // Simple bot responses based on keywords
+    setTimeout(() => {
+      let botResponse = "I'm here to help! Can you tell me more about your question?";
+      if (input.toLowerCase().includes("diagnosis")) {
+        botResponse = "Our AI-powered fault diagnosis analyzes vehicle data instantly. Would you like to know more?";
+      } else if (input.toLowerCase().includes("booking")) {
+        botResponse = "We offer predictive service booking with automated scheduling. Check our features section!";
+      } else if (input.toLowerCase().includes("support")) {
+        botResponse = "Our hybrid AI-human system handles queries 24/7. Visit the Support Hub for more.";
+      }
+      setMessages(prev => [...prev, { text: botResponse, sender: "bot" }]);
+    }, 1000);
+  };
 
   const useCases = [
     {
@@ -518,6 +544,63 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* Chatbot */}
+      <div className="fixed bottom-6 right-6 z-50">
+        {!chatOpen && (
+          <Button
+            onClick={() => setChatOpen(true)}
+            className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 shadow-2xl hover:scale-110 transition-transform"
+          >
+            <MessageSquare className="w-8 h-8 text-primary-foreground" />
+          </Button>
+        )}
+        {chatOpen && (
+          <div className="w-80 h-96 bg-card border border-border/50 rounded-2xl shadow-2xl flex flex-col backdrop-blur-xl">
+            <div className="flex items-center justify-between p-4 border-b border-border/50">
+              <div className="flex items-center gap-2">
+                <Brain className="w-6 h-6 text-primary" />
+                <span className="font-bold text-foreground">AI Assistant</span>
+              </div>
+              <Button
+                onClick={() => setChatOpen(false)}
+                variant="ghost"
+                size="sm"
+                className="w-8 h-8 p-0"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex-1 p-4 space-y-3 overflow-y-auto">
+              {messages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={`p-3 rounded-lg max-w-[80%] ${
+                    msg.sender === "user"
+                      ? "bg-primary text-primary-foreground ml-auto"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {msg.text}
+                </div>
+              ))}
+            </div>
+            <div className="p-4 border-t border-border/50 flex gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                placeholder="Type your message..."
+                className="flex-1 px-3 py-2 bg-background border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <Button onClick={handleSend} size="sm" className="px-3">
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
